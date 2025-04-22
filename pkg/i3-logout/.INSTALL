@@ -1,0 +1,23 @@
+post_install() {
+  # Copy config to user's dotfiles
+  if [ -d "$HOME/dotfiles/.config/archlinux-logout" ]; then
+    cp /etc/archlinux-logout.conf "$HOME/dotfiles/.config/archlinux-logout/archlinux-logout.conf"
+  else
+    mkdir -p "$HOME/dotfiles/.config/archlinux-logout"
+    cp /etc/archlinux-logout.conf "$HOME/dotfiles/.config/archlinux-logout/archlinux-logout.conf"
+  fi
+
+  # Create symlink in ~/.config/
+  if [ -d "$HOME/.config/archlinux-logout" ]; then
+    ln -sf "$HOME/dotfiles/.config/archlinux-logout/archlinux-logout.conf" \
+           "$HOME/.config/archlinux-logout/archlinux-logout.conf"
+  else
+    mkdir -p "$HOME/.config/archlinux-logout"
+    ln -sf "$HOME/dotfiles/.config/archlinux-logout/archlinux-logout.conf" \
+           "$HOME/.config/archlinux-logout/archlinux-logout.conf"
+  fi
+}
+
+post_upgrade() {
+  post_install
+}
