@@ -20,14 +20,14 @@ home = os.path.expanduser("~")
 base_dir = os.path.dirname(os.path.realpath(__file__))
 # here = Path(__file__).resolve()
 working_dir = "".join(
-    [str(Path(__file__).parents[2]), "/share/archlinux-logout-themes/"]
+    [str(Path(__file__).parents[2]), "/share/i3-logout-themes/"]
 )
-# config = "/etc/archlinux-logout.conf"
-if os.path.isfile(home + "/.config/archlinux-logout/archlinux-logout.conf"):
-    config = home + "/.config/archlinux-logout/archlinux-logout.conf"
+# config = "/etc/i3-logout.conf"
+if os.path.isfile(home + "/.config/i3-logout/i3-logout.conf"):
+    config = home + "/.config/i3-logout/i3-logout.conf"
 else:
-    config = "".join([str(Path(__file__).parents[3]), "/etc/archlinux-logout.conf"])
-root_config = "".join([str(Path(__file__).parents[3]), "/etc/archlinux-logout.conf"])
+    config = "".join([str(Path(__file__).parents[3]), "/etc/i3-logout.conf"])
+root_config = "".join([str(Path(__file__).parents[3]), "/etc/i3-logout.conf"])
 
 
 def _get_position(lists, value):
@@ -59,7 +59,7 @@ def cache_bl(self, GLib, Gtk):
                 )
 
         GLib.idle_add(self.lbl_stat.set_text, "")
-        os.unlink("/tmp/archlinux-logout.lock")
+        os.unlink("/tmp/i3-logout.lock")
         os.system(self.cmd_lock)
         Gtk.main_quit()
     else:
@@ -143,10 +143,10 @@ def get_config(self, Gdk, Gtk, config):
             )
     except Exception as e:
         print(e)
-        os.unlink(home + "/.config/archlinux-logout/archlinux-logout.conf")
-        if not os.path.isfile(home + "/.config/archlinux-logout/archlinux-logout.conf"):
+        os.unlink(home + "/.config/i3-logout/i3-logout.conf")
+        if not os.path.isfile(home + "/.config/i3-logout/i3-logout.conf"):
             shutil.copy(
-                root_config, home + "/.config/archlinux-logout/archlinux-logout.conf"
+                root_config, home + "/.config/i3-logout/i3-logout.conf"
             )
 
 
