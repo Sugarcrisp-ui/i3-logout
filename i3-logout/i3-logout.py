@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+import sys
+sys.path.append('/usr/share/i3-logout')
+
 # =====================================================
 #        Authors Brad Heffernan, Fennec and Erik Dubois
 # =====================================================
@@ -35,7 +39,7 @@ class TransparentWindow(Gtk.Window):
             cmd_hibernate = "loginctl hibernate"
 
     cmd_lock = 'betterlockscreen -l dim -- --time-str="%H:%M"'
-    wallpaper = "/usr/share/archlinux-betterlockscreen/wallpapers/wallpaper.jpg"
+    wallpaper = "/usr/share/betterlockscreen/wallpapers/wallpaper.jpg"
     d_buttons = [
         "cancel",
         "shutdown",
@@ -79,15 +83,15 @@ class TransparentWindow(Gtk.Window):
         self.connect("window-state-event", self.on_window_state_event)
         self.set_decorated(False)
 
-        if not fn.os.path.isdir(fn.home + "/.config/archlinux-logout"):
-            fn.os.mkdir(fn.home + "/.config/archlinux-logout")
+        if not fn.os.path.isdir(fn.home + "/.config/i3-logout"):
+            fn.os.mkdir(fn.home + "/.config/i3-logout")
 
         if not fn.os.path.isfile(
-            fn.home + "/.config/archlinux-logout/archlinux-logout.conf"
+            fn.home + "/.config/i3-logout/i3-logout.conf"
         ):
             shutil.copy(
                 fn.root_config,
-                fn.home + "/.config/archlinux-logout/archlinux-logout.conf",
+                fn.home + "/.config/i3-logout/i3-logout.conf",
             )
 
         self.width = 0
@@ -114,12 +118,12 @@ class TransparentWindow(Gtk.Window):
         self.present()
 
         GUI.GUI(self, Gtk, GdkPixbuf, fn.working_dir, fn.os, Gdk, fn)
-        if not fn.os.path.isfile("/tmp/archlinux-logout.lock"):
-            with open("/tmp/archlinux-logout.lock", "w") as f:
+        if not fn.os.path.isfile("/tmp/i3-logout.lock"):
+            with open("/tmp/i3-logout.lock", "w") as f:
                 f.write("")
 
     def display_on_monitor(self):
-        print("#### Archlinux Logout ####")
+        print("#### i3-logout ####")
         try:
             # test to see this device is a mouse
             if self.pointer.get_has_cursor():
@@ -187,7 +191,7 @@ class TransparentWindow(Gtk.Window):
     def on_save_clicked(self, widget):
         try:
             with open(
-                fn.home + "/.config/archlinux-logout/archlinux-logout.conf", "r"
+                fn.home + "/.config/i3-logout/i3-logout.conf", "r"
             ) as f:
                 lines = f.readlines()
                 f.close()
@@ -203,22 +207,22 @@ class TransparentWindow(Gtk.Window):
             lines[pos_font] = "font_size=" + str(int(self.fonts.get_value())) + "\n"
 
             with open(
-                fn.home + "/.config/archlinux-logout/archlinux-logout.conf", "w"
+                fn.home + "/.config/i3-logout/i3-logout.conf", "w"
             ) as f:
                 f.writelines(lines)
                 f.close()
             self.popover.popdown()
         except Exception as e:
-            fn.os.unlink(fn.home + "/.config/archlinux-logout/archlinux-logout.conf")
+            fn.os.unlink(fn.home + "/.config/i3-logout/i3-logout.conf")
             if not fn.os.path.isfile(
-                fn.home + "/.config/archlinux-logout/archlinux-logout.conf"
+                fn.home + "/.config/i3-logout/i3-logout.conf"
             ):
                 shutil.copy(
                     fn.root_config,
-                    fn.home + "/.config/archlinux-logout/archlinux-logout.conf",
+                    fn.home + "/.config/i3-logout/i3-logout.conf",
                 )
             with open(
-                fn.home + "/.config/archlinux-logout/archlinux-logout.conf", "r"
+                fn.home + "/.config/i3-logout/i3-logout.conf", "r"
             ) as f:
                 lines = f.readlines()
                 f.close()
@@ -234,7 +238,7 @@ class TransparentWindow(Gtk.Window):
             lines[pos_font] = "font_size=" + str(int(self.fonts.get_value())) + "\n"
 
             with open(
-                fn.home + "/.config/archlinux-logout/archlinux-logout.conf", "w"
+                fn.home + "/.config/i3-logout/i3-logout.conf", "w"
             ) as f:
                 f.writelines(lines)
                 f.close()
@@ -472,32 +476,32 @@ class TransparentWindow(Gtk.Window):
 
         if data == self.binds.get("logout"):
             command = fn._get_logout()
-            fn.os.unlink("/tmp/archlinux-logout.lock")
-            fn.os.unlink("/tmp/archlinux-logout.pid")
+            fn.os.unlink("/tmp/i3-logout.lock")
+            fn.os.unlink("/tmp/i3-logout.pid")
             self.__exec_cmd(command)
             Gtk.main_quit()
 
         elif data == self.binds.get("restart"):
-            fn.os.unlink("/tmp/archlinux-logout.lock")
-            fn.os.unlink("/tmp/archlinux-logout.pid")
+            fn.os.unlink("/tmp/i3-logout.lock")
+            fn.os.unlink("/tmp/i3-logout.pid")
             self.__exec_cmd(self.cmd_restart)
             Gtk.main_quit()
 
         elif data == self.binds.get("shutdown"):
-            fn.os.unlink("/tmp/archlinux-logout.lock")
-            fn.os.unlink("/tmp/archlinux-logout.pid")
+            fn.os.unlink("/tmp/i3-logout.lock")
+            fn.os.unlink("/tmp/i3-logout.pid")
             self.__exec_cmd(self.cmd_shutdown)
             Gtk.main_quit()
 
         elif data == self.binds.get("suspend"):
-            fn.os.unlink("/tmp/archlinux-logout.lock")
-            fn.os.unlink("/tmp/archlinux-logout.pid")
+            fn.os.unlink("/tmp/i3-logout.lock")
+            fn.os.unlink("/tmp/i3-logout.pid")
             self.__exec_cmd(self.cmd_suspend)
             Gtk.main_quit()
 
         elif data == self.binds.get("hibernate"):
-            fn.os.unlink("/tmp/archlinux-logout.lock")
-            fn.os.unlink("/tmp/archlinux-logout.pid")
+            fn.os.unlink("/tmp/i3-logout.lock")
+            fn.os.unlink("/tmp/i3-logout.pid")
             self.__exec_cmd(self.cmd_hibernate)
             Gtk.main_quit()
 
@@ -521,12 +525,12 @@ class TransparentWindow(Gtk.Window):
                     t.start()
                 else:
                     self.lbl_stat.set_markup(
-                        '<span size="x-large"><b>Choose a wallpaper with archlinux-betterlockscreen</b></span>'
+                        '<span size="x-large"><b>Choose a wallpaper with betterlockscreen</b></span>'
                     )  # noqa
                     self.Ec.set_sensitive(True)
                     self.active = False
             else:
-                fn.os.unlink("/tmp/archlinux-logout.lock")
+                fn.os.unlink("/tmp/i3-logout.lock")
                 self.__exec_cmd(self.cmd_lock)
                 Gtk.main_quit()
         elif data == self.binds.get("settings"):
@@ -539,16 +543,16 @@ class TransparentWindow(Gtk.Window):
             self.popover2.show_all()
             self.popover2.popup()
         else:
-            fn.os.unlink("/tmp/archlinux-logout.lock")
-            fn.os.unlink("/tmp/archlinux-logout.pid")
+            fn.os.unlink("/tmp/i3-logout.lock")
+            fn.os.unlink("/tmp/i3-logout.pid")
             Gtk.main_quit()
 
     def __exec_cmd(self, cmdline):
         fn.os.system(cmdline)
 
     def on_close(self, widget, data):
-        fn.os.unlink("/tmp/archlinux-logout.lock")
-        fn.os.unlink("/tmp/archlinux-logout.pid")
+        fn.os.unlink("/tmp/i3-logout.lock")
+        fn.os.unlink("/tmp/i3-logout.pid")
         Gtk.main_quit()
 
     def message_box(self, message, title):
@@ -571,15 +575,15 @@ class TransparentWindow(Gtk.Window):
 
 def signal_handler(sig, frame):
     print("\nArchLinux-Logout is Closing.")
-    fn.os.unlink("/tmp/archlinux-logout.lock")
-    fn.os.unlink("/tmp/archlinux-logout.pid")
+    fn.os.unlink("/tmp/i3-logout.lock")
+    fn.os.unlink("/tmp/i3-logout.pid")
     Gtk.main_quit(0)
 
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
-    if not fn.os.path.isfile("/tmp/archlinux-logout.lock"):
-        with open("/tmp/archlinux-logout.pid", "w") as f:
+    if not fn.os.path.isfile("/tmp/i3-logout.lock"):
+        with open("/tmp/i3-logout.pid", "w") as f:
             f.write(str(fn.os.getpid()))
             f.close()
         w = TransparentWindow()
@@ -587,5 +591,5 @@ if __name__ == "__main__":
         Gtk.main()
     else:
         print(
-            "ArchLinux-logout did not close properly. Remove /tmp/archlinux-logout.lock with sudo."
+            "ArchLinux-logout did not close properly. Remove /tmp/i3-logout.lock with sudo."
         )
