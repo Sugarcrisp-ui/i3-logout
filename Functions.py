@@ -19,15 +19,14 @@ home = os.path.expanduser("~")
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 # here = Path(__file__).resolve()
-working_dir = "".join(
-    [str(Path(__file__).parents[2]), "/share/i3-logout-themes/"]
-)
+# Use the repository root as the working directory so local `themes/` is found
+working_dir = base_dir
 # config = "/etc/i3-logout.conf"
 if os.path.isfile(home + "/.config/i3-logout/i3-logout.conf"):
     config = home + "/.config/i3-logout/i3-logout.conf"
 else:
-    config = "".join([str(Path(__file__).parents[3]), "/etc/i3-logout.conf"])
-root_config = "".join([str(Path(__file__).parents[3]), "/etc/i3-logout.conf"])
+    config = "/etc/i3-logout.conf"
+root_config = "/etc/i3-logout.conf"
 
 
 def _get_position(lists, value):
@@ -37,7 +36,7 @@ def _get_position(lists, value):
 
 
 def _get_themes():
-    y = [x for x in os.listdir(working_dir + "themes")]
+    y = [x for x in os.listdir(os.path.join(working_dir, "themes"))]
     y.sort()
     return y
 
@@ -133,7 +132,7 @@ def get_config(self, Gdk, Gtk, config):
         if len(self.theme) > 1:
             style_provider = Gtk.CssProvider()
             style_provider.load_from_path(
-                working_dir + "themes/" + self.theme + "/theme.css"
+                os.path.join(working_dir, "themes", self.theme, "theme.css")
             )
 
             Gtk.StyleContext.add_provider_for_screen(
@@ -143,11 +142,65 @@ def get_config(self, Gdk, Gtk, config):
             )
     except Exception as e:
         print(e)
-        os.unlink(home + "/.config/i3-logout/i3-logout.conf")
-        if not os.path.isfile(home + "/.config/i3-logout/i3-logout.conf"):
-            shutil.copy(
-                root_config, home + "/.config/i3-logout/i3-logout.conf"
-            )
+        # If the user's config is malformed, regenerate a safe default config
+        user_cfg_dir = os.path.join(home, ".config", "i3-logout")
+        os.makedirs(user_cfg_dir, exist_ok=True)
+        user_cfg = os.path.join(user_cfg_dir, "i3-logout.conf")
+        default_conf = """[themes]
+theme = white
+
+[settings]
+opacity = 80
+buttons = cancel,shutdown,restart,suspend,hibernate,lock,logout
+icon_size = 64
+font_size = 11
+show_on_monitor = 0
+
+[binds]
+lock = K
+restart = R
+shutdown = S
+suspend = U
+hibernate = H
+logout = L
+cancel = Escape
+settings = P
+
+[commands]
+lock = betterlockscreen -l dim -- --time-str="%H:%M"
+shutdown = systemctl poweroff
+restart = systemctl reboot
+suspend = systemctl suspend
+hibernate = systemctl hibernate
+"""
+        try:
+            with open(user_cfg, "w") as f:
+                f.write(default_conf)
+        except Exception:
+            # If we cannot write, attempt to copy system default if present
+            if os.path.isfile(root_config):
+                shutil.copy(root_config, user_cfg)
+
+        # Reload parser from the regenerated config and set some safe defaults
+        try:
+            self.parser.read(user_cfg)
+            if self.parser.has_section("settings"):
+                if self.parser.has_option("settings", "opacity"):
+                    self.opacity = int(self.parser.get("settings", "opacity")) / 100
+                if self.parser.has_option("settings", "buttons"):
+                    self.buttons = self.parser.get("settings", "buttons").split(",")
+                if self.parser.has_option("settings", "icon_size"):
+                    self.icon = int(self.parser.get("settings", "icon_size"))
+                if self.parser.has_option("settings", "font_size"):
+                    self.font = int(self.parser.get("settings", "font_size"))
+                if self.parser.has_option("settings", "show_on_monitor"):
+                    self.show_on_monitor = self.parser.get("settings", "show_on_monitor")
+            if self.parser.has_section("themes") and self.parser.has_option("themes", "theme"):
+                self.theme = self.parser.get("themes", "theme")
+        except Exception:
+            # Last-resort safe defaults
+            self.opacity = 0.8
+            self.theme = "white"
 
 
 def _get_logout():
